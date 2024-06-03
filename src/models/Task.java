@@ -1,7 +1,8 @@
-import java.util.Objects;
+package models;
 
 public class Task {
 
+    protected int id;
     protected String name;
     protected String description;
     protected TaskStatus taskStatus;
@@ -10,6 +11,12 @@ public class Task {
         this.name = name;
         this.description = description;
         this.taskStatus = taskStatus;
+    }
+
+    public void change(Task task) {
+        this.name = task.getName();
+        this.description = task.getDescription();
+        this.taskStatus = task.getTaskStatus();
     }
 
     public String getName() {
@@ -24,8 +31,16 @@ public class Task {
         return taskStatus;
     }
 
-    public void changeStatus(TaskStatus taskStatus){
+    public void changeStatus(TaskStatus taskStatus) {
         this.taskStatus = taskStatus;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     @Override
@@ -33,18 +48,19 @@ public class Task {
         if (this == object) return true;
         if (object == null || getClass() != object.getClass()) return false;
         Task task = (Task) object;
-        return Objects.equals(name, task.name) && Objects.equals(description, task.description);
+        return task.id == this.id;
     }
 
     @Override
     public int hashCode() {
-        return 11 * Objects.hash(name, description);
+        return 11 * id;
     }
 
     @Override
     public String toString() {
         return "Task{" +
-                "name='" + name + '\'' +
+                "id=" + id +
+                ", name='" + name + '\'' +
                 ", description='" + description + '\'' +
                 ", taskStatus=" + taskStatus +
                 '}';
