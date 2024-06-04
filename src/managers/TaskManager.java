@@ -25,7 +25,10 @@ public class TaskManager {
     }
 
     public List<SubTask> getEpicSubtasks(int epicId) {
-        return getEpic(epicId).getSubTasks();
+        Epic epic = getEpic(epicId);
+        if (epic == null) return null;
+
+        return epic.getSubTasks();
     }
 
     public Task getTask(int id) {
@@ -63,6 +66,7 @@ public class TaskManager {
 
         int id = serial++;
         subtask.setId(id);
+        currentEpic.addNewSubTask(subtask);
         subtasks.put(id, subtask);
         return subtask.getId();
     }
@@ -75,15 +79,19 @@ public class TaskManager {
 
     public void updateEpic(Epic epic) {
         int id = epic.getId();
-        if (epics.get(id) == null) return;
-        epics.put(id, epic);
+        Epic storageEpic = epics.get(id);
+        if (storageEpic == null) return;
+
+        storageEpic.setName(epic.getName());
+        storageEpic.setDescription(epic.getDescription());
     }
 
     public void updateSubtask(SubTask subtask) {
         int id = subtask.getId();
         SubTask storageSubtask = subtasks.get(id);
         if (storageSubtask == null) return;
-        storageSubtask.getCurrentEpic().updateStatus();
+        Epic currentEpic = getEpic(storageSubtask.getCurrentEpic().getId());
+        currentEpic.updateSubTask(subtask);
         subtasks.put(id, subtask);
     }
 
@@ -98,13 +106,14 @@ public class TaskManager {
         for (SubTask subTask : epic.getSubTasks()){
             subtasks.remove(subTask.getId());
         }
-        epic.removeAllSubTasks();
     }
 
     public void deleteSubtask(int id) {
         SubTask subTask = subtasks.remove(id);
         if (subTask == null) return;
-        subTask.getCurrentEpic().removeSubTask(subTask);
+        int epicId = subTask.getCurrentEpic().getId();
+        Epic currentEpic = getEpic(epicId);
+        currentEpic.removeSubTask(subTask);
     }
 
     public void deleteTasks() {

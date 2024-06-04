@@ -1,6 +1,6 @@
 package models;
 
-public class SubTask extends AbstractTask{
+public class SubTask extends Task {
     private Epic currentEpic;
 
     public SubTask(String name, String description, TaskStatus taskStatus) {

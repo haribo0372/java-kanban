@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 
-public class Epic extends AbstractTask {
+public class Epic extends Task {
     private final ArrayList<SubTask> subTasks;
 
     public Epic(String name, String description) {
@@ -22,12 +22,23 @@ public class Epic extends AbstractTask {
         return subTasks;
     }
 
-    public void removeSubTask(SubTask subTask){
+    public void updateSubTask(SubTask subTask){
+        for (SubTask subTask1 : subTasks){
+            if (subTask1.equals(subTask)){
+                subTask1.setName(subTask.getName());
+                subTask1.setDescription(subTask.getDescription());
+                subTask1.setStatus(subTask.getTaskStatus());
+            }
+        }
+        updateStatus();
+    }
+
+    public void removeSubTask(SubTask subTask) {
         subTasks.remove(subTask);
         updateStatus();
     }
 
-    public void removeAllSubTasks(){
+    public void removeAllSubTasks() {
         subTasks.clear();
         updateStatus();
     }
@@ -50,7 +61,7 @@ public class Epic extends AbstractTask {
 
     @Override
     public String toString() {
-        int[] arrayWithSubTasksId = subTasks.stream().mapToInt(AbstractTask::getId).toArray();
+        int[] arrayWithSubTasksId = subTasks.stream().mapToInt(Task::getId).toArray();
         return "Epic{" +
                 "id=" + id +
                 ", name='" + name + '\'' +

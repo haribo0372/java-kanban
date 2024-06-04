@@ -17,13 +17,13 @@ public class Main {
         Epic epic1 = new Epic("Уборка", "На новый год приезжают гости, нужно убраться");
         SubTask subTask1 = new SubTask("Помыть посуду", "Посуду помыть", TaskStatus.NEW);
         SubTask subTask2 = new SubTask("Помыть пол", "Пол помыть", TaskStatus.NEW);
-        epic1.addNewSubTask(subTask1);
-        epic1.addNewSubTask(subTask2);
+        subTask1.setCurrentEpic(epic1);
+        subTask2.setCurrentEpic(epic1);
 
         // Создайте эпик с одной подзадачей
         Epic epic2 = new Epic("Фантазия покинула", "");
         SubTask subTask3 = new SubTask("some subtask", "some subtask", TaskStatus.NEW);
-        epic2.addNewSubTask(subTask3);
+        subTask3.setCurrentEpic(epic2);
 
         // Добавляем все задачи на вооружение менеджеру
         taskManager.addNewTask(task1);
@@ -100,8 +100,7 @@ public class Main {
     }
 
      static void printAllTasks() {
-        List<AbstractTask> allTasks = new ArrayList<>();
-        allTasks.addAll(taskManager.getTasks());
+        List<Task> allTasks = taskManager.getTasks();
         allTasks.addAll(taskManager.getEpics());
         allTasks.addAll(taskManager.getSubtasks());
         for (Object task : allTasks) {
