@@ -1,59 +1,10 @@
 package models;
 
-public class Task {
+public class Task extends AbstractTask{
 
-    protected int id;
-    protected String name;
-    protected String description;
-    protected TaskStatus taskStatus;
 
     public Task(String name, String description, TaskStatus taskStatus) {
-        this.name = name;
-        this.description = description;
-        this.taskStatus = taskStatus;
-    }
-
-    public void change(Task task) {
-        this.name = task.getName();
-        this.description = task.getDescription();
-        this.taskStatus = task.getTaskStatus();
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public TaskStatus getTaskStatus() {
-        return taskStatus;
-    }
-
-    public void changeStatus(TaskStatus taskStatus) {
-        this.taskStatus = taskStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    @Override
-    public boolean equals(Object object) {
-        if (this == object) return true;
-        if (object == null || getClass() != object.getClass()) return false;
-        Task task = (Task) object;
-        return task.id == this.id;
-    }
-
-    @Override
-    public int hashCode() {
-        return 11 * id;
+        super(name, description, taskStatus);
     }
 
     @Override

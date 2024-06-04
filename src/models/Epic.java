@@ -1,10 +1,11 @@
 package models;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 
-public class Epic extends Task {
-    private ArrayList<SubTask> subTasks;
+public class Epic extends AbstractTask {
+    private final ArrayList<SubTask> subTasks;
 
     public Epic(String name, String description) {
         super(name, description, TaskStatus.NEW);
@@ -12,8 +13,8 @@ public class Epic extends Task {
     }
 
     public void addNewSubTask(SubTask subTask) {
-        subTask.setCurrentEpic(this);
         subTasks.add(subTask);
+        subTask.setCurrentEpic(this);
         updateStatus();
     }
 
@@ -21,9 +22,14 @@ public class Epic extends Task {
         return subTasks;
     }
 
-    public void change(Epic epic){
-        super.change(epic);
-        subTasks = epic.getSubTasks();
+    public void removeSubTask(SubTask subTask){
+        subTasks.remove(subTask);
+        updateStatus();
+    }
+
+    public void removeAllSubTasks(){
+        subTasks.clear();
+        updateStatus();
     }
 
     public void updateStatus() {
@@ -44,12 +50,13 @@ public class Epic extends Task {
 
     @Override
     public String toString() {
+        int[] arrayWithSubTasksId = subTasks.stream().mapToInt(AbstractTask::getId).toArray();
         return "Epic{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
                 ", description='" + description + '\'' +
                 ", taskStatus=" + taskStatus +
-                ", subTasks=" + subTasks +
+                ", subTasksId=" + Arrays.toString(arrayWithSubTasksId) +
                 '}';
     }
 }
