@@ -33,9 +33,14 @@ public class InMemoryHistoryManagerTest {
         Epic epic = new Epic("name_2", "description_2");
         SubTask subTask = new SubTask("name_3", "description_3", TaskStatus.NEW);
 
-        assertTrue(historyManager.add(task), "Не удалось добавить задачу в историю");
-        assertTrue(historyManager.add(epic), "Не удалось добавить эпик в историю");
-        assertTrue(historyManager.add(subTask), "Не удалось добавить подзадачу в историю");
+        historyManager.add(task);
+        assertTrue(historyManager.getHistory().contains(task), "Не удалось добавить задачу в историю");
+
+        historyManager.add(epic);
+        assertTrue(historyManager.getHistory().contains(epic), "Не удалось добавить эпик в историю");
+
+        historyManager.add(subTask);
+        assertTrue(historyManager.getHistory().contains(subTask), "Не удалось добавить подзадачу в историю");
 
         List<Task> rightHistory = List.of(subTask, epic, task, task);
 

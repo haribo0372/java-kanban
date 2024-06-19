@@ -9,14 +9,15 @@ public class InMemoryHistoryManager implements HistoryManager {
     private final List<Task> history = new ArrayList<>();
 
     @Override
-    public boolean add(Task task) {
+    public void add(Task task) {
+        if (task == null) return;
+
         history.addFirst(task);
         if (history.size() > 10) history.removeLast();
-        return true;
     }
 
     @Override
     public List<Task> getHistory() {
-        return history;
+        return new ArrayList<>(history);
     }
 }
