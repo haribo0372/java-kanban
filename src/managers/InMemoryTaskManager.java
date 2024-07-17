@@ -5,7 +5,6 @@ import models.SubTask;
 import models.Task;
 
 import java.util.*;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 public class InMemoryTaskManager implements TaskManager {
     private int serial = 1;
@@ -134,6 +133,7 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void deleteEpic(int id) {
         Epic epic = epics.remove(id);
+        historyManager.remove(id);
         if (epic == null) return;
 
         for (SubTask subTask : epic.getSubTasks()) {
