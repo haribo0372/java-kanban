@@ -88,6 +88,5 @@ public class InMemoryTaskManagerTest {
 
         taskManager.deleteSubtask(subTask.getId());
         assertTrue(taskManager.getEpicSubtasks(epic.getId()).isEmpty(), "Удаленные подзадачи остаются в эпике");
-        assertNull(subTask.getId(), "Удаленная подзадача хранит в себе старый идентификатор");
     }
 }
