@@ -56,7 +56,7 @@ public class InMemoryHistoryManagerTest {
         historyManager.add(subTask);
         assertTrue(historyManager.getHistory().contains(subTask), "Не удалось добавить подзадачу в историю");
 
-        List<Task> rightHistory = List.of(subTask, epic, task);
+        List<Task> rightHistory = List.of(task, epic, subTask);
         List<Task> currentHistory = historyManager.getHistory();
 
         assertEquals(currentHistory, rightHistory, "История запросов высчитывается неверно");
@@ -64,28 +64,28 @@ public class InMemoryHistoryManagerTest {
 
     @Test
     void testEmbeddedLinkedList() {
-        historyManager.linkLast(task);
-        assertEquals(historyManager.getTasks().getLast(), task, "Добавление в встроенный связный список" +
+        historyManager.add(task);
+        assertEquals(historyManager.getHistory().getLast(), task, "Добавление в встроенный связный список" +
                 " происходит неверно");
 
-        historyManager.linkLast(epic);
-        assertEquals(historyManager.getTasks().getLast(), epic, "Добавление в встроенный связный список" +
+        historyManager.add(epic);
+        assertEquals(historyManager.getHistory().getLast(), epic, "Добавление в встроенный связный список" +
                 " происходит неверно");
 
-        historyManager.linkLast(subTask);
-        assertEquals(historyManager.getTasks().getLast(), subTask, "Добавление в встроенный связный список" +
+        historyManager.add(subTask);
+        assertEquals(historyManager.getHistory().getLast(), subTask, "Добавление в встроенный связный список" +
                 " происходит неверно");
 
 
         List<Task> rightHistory = List.of(task, epic, subTask);
-        List<Task> currentHistory = historyManager.getTasks();
+        List<Task> currentHistory = historyManager.getHistory();
 
         assertEquals(currentHistory, rightHistory, "Добавление в встроенный связный список" +
                 " происходит неверно");
 
         historyManager.remove(epic.getId());
         rightHistory = List.of(task, subTask);
-        currentHistory = historyManager.getTasks();
+        currentHistory = historyManager.getHistory();
 
         assertEquals(currentHistory, rightHistory, "Удаление из встроенного связного списка" +
                 " происходит неверно");

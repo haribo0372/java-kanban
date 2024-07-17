@@ -1,4 +1,4 @@
-package my.util;
+package util;
 
 public class Node<T> {
     public Node<T> prev;
