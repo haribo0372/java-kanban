@@ -81,10 +81,10 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public int addNewSubtask(SubTask subtask) {
         Epic currentEpic = subtask.getCurrentEpic();
-        if (currentEpic == null) return 0;
+        if (currentEpic == null) return -1;
 
         int currentEpicId = currentEpic.getId();
-        if (epics.get(currentEpicId) == null) return 0;
+        if (epics.get(currentEpicId) == null) return -1;
 
         int id = serial++;
         subtask.setId(id);
@@ -136,9 +136,8 @@ public class InMemoryTaskManager implements TaskManager {
         historyManager.remove(id);
         if (epic == null) return;
 
-        for (SubTask subTask : epic.getSubTasks()) {
-            subtasks.remove(subTask.getId());
-        }
+        epic.getSubTasks().forEach(subTask ->
+                subtasks.remove(subTask.getId()));
     }
 
     @Override
@@ -148,6 +147,7 @@ public class InMemoryTaskManager implements TaskManager {
         int epicId = subTask.getCurrentEpic().getId();
         Epic currentEpic = getEpic(epicId);
         currentEpic.removeSubTask(subTask);
+        subTask.setId(null);
     }
 
     @Override
