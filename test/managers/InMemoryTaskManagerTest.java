@@ -76,4 +76,17 @@ public class InMemoryTaskManagerTest {
         assertEquals(1, subTasks.size(), "Неверное количество подзадач.");
         assertEquals(subTask, subTasks.get(0), "Подзадачи не совпадают.");
     }
+
+    @Test
+    void deleteSubTask() {
+        Epic epic = new Epic("name_1", "description_1");
+        SubTask subTask = new SubTask("name_1", "description_1", TaskStatus.NEW);
+        subTask.setCurrentEpic(epic);
+
+        taskManager.addNewEpic(epic);
+        taskManager.addNewSubtask(subTask);
+
+        taskManager.deleteSubtask(subTask.getId());
+        assertTrue(taskManager.getEpicSubtasks(epic.getId()).isEmpty(), "Удаленные подзадачи остаются в эпике");
+    }
 }

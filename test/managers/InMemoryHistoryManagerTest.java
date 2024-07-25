@@ -8,21 +8,36 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.stream.IntStream;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 public class InMemoryHistoryManagerTest {
     InMemoryHistoryManager historyManager;
+    Task task;
+    Epic epic;
+    SubTask subTask;
+    int count;
 
     @BeforeEach
     void beforeEach() {
         historyManager = new InMemoryHistoryManager();
+
+        count = 0;
+
+        task = new Task("name_1", "description_1", TaskStatus.NEW);
+        task.setId(++count);
+
+        epic = new Epic("name_2", "description_2");
+        epic.setId(++count);
+
+        subTask = new SubTask("name_3", "description_3", TaskStatus.NEW);
+        subTask.setId(++count);
+        subTask.setCurrentEpic(epic);
     }
 
     @Test
     void add() {
-        Task task = new Task("name_1", "description_1", TaskStatus.NEW);
+
         historyManager.add(task);
         Task savedTask = historyManager.getHistory().get(0);
 
@@ -30,8 +45,7 @@ public class InMemoryHistoryManagerTest {
         assertEquals(task.getDescription(), savedTask.getDescription(), "Описание задач не равны после добавления");
         assertEquals(task.getTaskStatus(), savedTask.getTaskStatus(), "Статусы задач не равны после добавления");
 
-        Epic epic = new Epic("name_2", "description_2");
-        SubTask subTask = new SubTask("name_3", "description_3", TaskStatus.NEW);
+        subTask.setCurrentEpic(epic);
 
         historyManager.add(task);
         assertTrue(historyManager.getHistory().contains(task), "Не удалось добавить задачу в историю");
@@ -42,12 +56,39 @@ public class InMemoryHistoryManagerTest {
         historyManager.add(subTask);
         assertTrue(historyManager.getHistory().contains(subTask), "Не удалось добавить подзадачу в историю");
 
-        List<Task> rightHistory = List.of(subTask, epic, task, task);
+        List<Task> rightHistory = List.of(task, epic, subTask);
+        List<Task> currentHistory = historyManager.getHistory();
 
-        assertEquals(historyManager.getHistory(), rightHistory, "История запросов высчитывается неверно");
+        assertEquals(currentHistory, rightHistory, "История запросов высчитывается неверно");
+    }
 
-        IntStream.range(0, 10).forEach(i -> historyManager.add(task));
+    @Test
+    void testEmbeddedLinkedList() {
+        historyManager.add(task);
+        assertEquals(historyManager.getHistory().getLast(), task, "Добавление в встроенный связный список" +
+                " происходит неверно");
 
-        assertEquals(10, historyManager.getHistory().size(), "Не соблюдается ограничение истории в 10 элементов");
+        historyManager.add(epic);
+        assertEquals(historyManager.getHistory().getLast(), epic, "Добавление в встроенный связный список" +
+                " происходит неверно");
+
+        historyManager.add(subTask);
+        assertEquals(historyManager.getHistory().getLast(), subTask, "Добавление в встроенный связный список" +
+                " происходит неверно");
+
+
+        List<Task> rightHistory = List.of(task, epic, subTask);
+        List<Task> currentHistory = historyManager.getHistory();
+
+        assertEquals(currentHistory, rightHistory, "Добавление в встроенный связный список" +
+                " происходит неверно");
+
+        historyManager.remove(epic.getId());
+        rightHistory = List.of(task, subTask);
+        currentHistory = historyManager.getHistory();
+
+        assertEquals(currentHistory, rightHistory, "Удаление из встроенного связного списка" +
+                " происходит неверно");
+
     }
 }

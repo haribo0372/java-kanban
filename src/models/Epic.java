@@ -22,9 +22,9 @@ public class Epic extends Task {
         return subTasks;
     }
 
-    public void updateSubTask(SubTask subTask){
-        for (SubTask subTask1 : subTasks){
-            if (subTask1.equals(subTask)){
+    public void updateSubTask(SubTask subTask) {
+        for (SubTask subTask1 : subTasks) {
+            if (subTask1.equals(subTask)) {
                 subTask1.setName(subTask.getName());
                 subTask1.setDescription(subTask.getDescription());
                 subTask1.setStatus(subTask.getTaskStatus());
