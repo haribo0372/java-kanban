@@ -4,6 +4,7 @@ import models.Epic;
 import models.SubTask;
 import models.Task;
 import models.TaskStatus;
+import util.ManagerLoadException;
 import util.ManagerSaveException;
 
 import java.io.BufferedWriter;
@@ -71,30 +72,33 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         FileBackedTaskManager backedTaskManager = new FileBackedTaskManager(file);
         List<Integer> epicsId = new ArrayList<>();
         List<SubTask> subTaskArrayList = new ArrayList<>();
+        int maxForSerial = 1;
         String[] strings;
         try {
             strings = Files.readString(file.toPath()).split("\n");
             for (int i = 1; i < strings.length; i++) {
                 String[] currentTask = strings[i].split(",");
+                int id = Integer.parseInt(currentTask[0]);
                 if (currentTask[1].equals("TASK")) {
                     Task task = new Task(currentTask[2], currentTask[4], validateTaskStatus(currentTask[3]));
-                    task.setId(Integer.parseInt(currentTask[0]));
+                    task.setId(id);
                     backedTaskManager.tasks.put(task.getId(), task);
                 } else if (currentTask[1].equals("EPIC")) {
                     Epic epic = new Epic(currentTask[2], currentTask[4]);
-                    epic.setId(Integer.parseInt(currentTask[0]));
+                    epic.setId(id);
                     backedTaskManager.epics.put(epic.getId(), epic);
                 } else if (currentTask[1].equals("SUBTASK")) {
                     SubTask subTask = new SubTask(currentTask[2], currentTask[4], validateTaskStatus(currentTask[3]));
-                    subTask.setId(Integer.parseInt(currentTask[0]));
+                    subTask.setId(id);
 
                     if (!currentTask[5].equals("null")) {
                         subTaskArrayList.add(subTask);
                         epicsId.add(Integer.parseInt(currentTask[5]));
                     }
                 }
-                backedTaskManager.serial++;
+                if (id > maxForSerial) maxForSerial = id;
             }
+            backedTaskManager.serial = maxForSerial + 1;
 
             for (int i = 0; i < subTaskArrayList.size(); i++) {
                 Epic epic = backedTaskManager.epics.get(epicsId.get(i));
@@ -107,48 +111,27 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
             }
 
         } catch (IOException e) {
-            throw new ManagerSaveException("Не удалось загрузить данные из файла");
+            throw new ManagerLoadException("Не удалось загрузить данные из файла");
         }
         return backedTaskManager;
     }
 
     private static TaskStatus validateTaskStatus(String taskStatus) {
-        if (taskStatus.equals("NEW")) return TaskStatus.NEW;
-        if (taskStatus.equals("IN_PROGRESS")) return TaskStatus.IN_PROGRESS;
-        else return TaskStatus.DONE;
+        return TaskStatus.valueOf(taskStatus);
     }
 
     private void save() {
         List<Task> tasks = super.getTasks();
-        List<Epic> epics = super.getEpics();
-        List<SubTask> subTasks = super.getSubtasks();
+        tasks.addAll(super.getEpics());
+        tasks.addAll(super.getSubtasks());
+
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
             writer.write("id,type,name,status,description,epic\n");
-            tasks.forEach(i -> {
-                try {
-                    writer.write(i.toStringCSV() + '\n');
-                } catch (IOException e) {
-                    throw new ManagerSaveException("Не удалось сохранить данные на диск");
-                }
-            });
 
-            epics.forEach(i -> {
-                try {
-                    writer.write(i.toStringCSV() + '\n');
-                } catch (IOException e) {
-                    throw new ManagerSaveException("Не удалось сохранить данные на диск");
-                }
-            });
+            for (Task i : tasks) writer.write(i.toStringCSV() + '\n');
 
-            subTasks.forEach(i -> {
-                try {
-                    writer.write(i.toStringCSV() + '\n');
-                } catch (IOException e) {
-                    throw new ManagerSaveException("Не удалось сохранить данные на диск");
-                }
-            });
         } catch (IOException e) {
-            System.out.println("Не удалось сохранить данные на диск");
+            throw new ManagerSaveException("Не удалось сохранить данные на диск");
         }
     }
 

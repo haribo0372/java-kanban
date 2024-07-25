@@ -75,22 +75,37 @@ public class FileBackedTaskManagerTest {
         SubTask restoredSubtask2 = restoredManager.getSubtask(subTask2.getId());
         SubTask restoredSubtask3 = restoredManager.getSubtask(subTask3.getId());
 
-        List<Task> rightTaskList = createSortedListWithTasks(task, epic1, epic2, subTask1, subTask2, subTask3);
-        List<Task> currentTaskList =
-                createSortedListWithTasks(
-                        restoredTask, restoredEpic1,
-                        restoredEpic2, restoredSubtask1,
-                        restoredSubtask2, restoredSubtask3);
-
-        for (int i = 0; i < rightTaskList.size(); i++) {
-            assertEquals(rightTaskList.get(i), currentTaskList.get(i), message);
-        }
-
+        assertTrue(checkEqualTasks(restoredTask, task), message);
+        assertTrue(checkEqualEpic(restoredEpic1, epic1), message);
+        assertTrue(checkEqualEpic(restoredEpic2, epic2), message);
+        assertTrue(checkEqualSubTask(restoredSubtask1, subTask1), message);
+        assertTrue(checkEqualSubTask(restoredSubtask2, subTask2), message);
+        assertTrue(checkEqualSubTask(restoredSubtask3, subTask3), message);
     }
 
-    List<Task> createSortedListWithTasks(Task... tasks) {
-        List<Task> taskList = new ArrayList<>(Arrays.asList(tasks));
-        taskList.sort(Comparator.comparingInt(Task::getId));
-        return taskList;
+    boolean checkEqualTasks(Task t1, Task t2) {
+        if (!Objects.equals(t1.getId(), t2.getId())) return false;
+        if (t1.getTaskStatus() != t2.getTaskStatus()) return false;
+        if (!t1.getName().equals(t2.getName())) return false;
+        return t1.getDescription().equals(t2.getDescription());
+    }
+
+    boolean checkEqualSubTask(SubTask subTask1, SubTask subTask2) {
+        if (!Objects.equals(subTask1.getCurrentEpic().getId(), subTask2.getCurrentEpic().getId()))
+            return false;
+        return checkEqualTasks(subTask1, subTask2);
+    }
+
+    boolean checkEqualEpic(Epic epic1, Epic epic2) {
+        List<SubTask> list1 = epic1.getSubTasks();
+        List<SubTask> list2 = epic2.getSubTasks();
+
+        if (list1.size() != list2.size()) return false;
+
+        for (int i = 0; i < list1.size(); i++) {
+            if (!checkEqualSubTask(list1.get(i), list2.get(i))) return false;
+        }
+
+        return checkEqualTasks(epic1, epic2);
     }
 }

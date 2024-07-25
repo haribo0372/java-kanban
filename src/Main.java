@@ -2,9 +2,19 @@ import managers.FileBackedTaskManager;
 import models.*;
 
 import java.io.File;
+import java.io.IOException;
 
 public class Main {
-    private static final FileBackedTaskManager taskManager = FileBackedTaskManager.loadFromFile(new File("example.txt"));
+    private static final FileBackedTaskManager taskManager;
+
+    static {
+        try {
+            File file = File.createTempFile("example", "txt");
+            taskManager = FileBackedTaskManager.loadFromFile(file);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     public static void main(String[] args) {
         Task task = new Task("task_name_1", "task_description_1", TaskStatus.NEW);
@@ -24,23 +34,6 @@ public class Main {
         taskManager.addNewSubtask(subTask2);
         taskManager.addNewEpic(epic2);
         taskManager.addNewSubtask(subTask3);
-
-//        Epic epic1 = new Epic("Уборка", "epic_1");
-//        Epic epic2 = new Epic("Спорт", "epic_2");
-//
-//        SubTask subTask1 = new SubTask("Помыть посуду", "Посуду помыть", TaskStatus.NEW);
-//        SubTask subTask2 = new SubTask("Помыть пол", "Пол помыть", TaskStatus.NEW);
-//        SubTask subTask3 = new SubTask("Пропылесосить", "Пропылесосить", TaskStatus.NEW);
-//
-//        subTask1.setCurrentEpic(epic1);
-//        subTask2.setCurrentEpic(epic1);
-//        subTask3.setCurrentEpic(epic1);
-//
-//        taskManager.addNewEpic(epic1);
-//        taskManager.addNewEpic(epic2);
-//        taskManager.addNewSubtask(subTask1);
-//        taskManager.addNewSubtask(subTask2);
-//        taskManager.addNewSubtask(subTask3);
         printAllTasks();
     }
 
