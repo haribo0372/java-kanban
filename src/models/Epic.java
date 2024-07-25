@@ -70,4 +70,9 @@ public class Epic extends Task {
                 ", subTasksId=" + Arrays.toString(arrayWithSubTasksId) +
                 '}';
     }
+
+    @Override
+    public String toStringCSV() {
+        return String.format("%s,EPIC,%s,%s,%s", id, name, taskStatus, description);
+    }
 }

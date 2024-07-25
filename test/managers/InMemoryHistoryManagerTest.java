@@ -37,7 +37,6 @@ public class InMemoryHistoryManagerTest {
 
     @Test
     void add() {
-
         historyManager.add(task);
         Task savedTask = historyManager.getHistory().get(0);
 
