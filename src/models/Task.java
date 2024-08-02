@@ -67,4 +67,8 @@ public class Task {
                 ", taskStatus=" + taskStatus +
                 '}';
     }
+
+    public String toStringCSV() {
+        return String.format("%s,TASK,%s,%s,%s", id, name, taskStatus, description);
+    }
 }

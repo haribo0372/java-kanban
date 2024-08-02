@@ -19,10 +19,19 @@ public class SubTask extends Task {
     public String toString() {
         return "SubTask{" +
                 "id=" + id +
+                ", currentEpic=" + currentEpic.getId() +
                 ", name='" + name + '\'' +
                 ", description='" + description + '\'' +
                 ", taskStatus=" + taskStatus +
-                ", currentEpicId=" + currentEpic.getId() +
                 '}';
+    }
+
+    @Override
+    public String toStringCSV() {
+        String result = String.format("%s,SUBTASK,%s,%s,%s", id, name, taskStatus, description);
+        if (currentEpic == null)
+            return result + ",null";
+
+        return String.format("%s,%s", result, currentEpic.getId());
     }
 }

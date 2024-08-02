@@ -1,39 +1,40 @@
-import managers.InMemoryTaskManager;
-import managers.TaskManager;
+import managers.FileBackedTaskManager;
 import models.*;
 
+import java.io.File;
+import java.io.IOException;
+
 public class Main {
-    private static final TaskManager taskManager = new InMemoryTaskManager();
+    private static final FileBackedTaskManager taskManager;
+
+    static {
+        try {
+            File file = File.createTempFile("example", "txt");
+            taskManager = FileBackedTaskManager.loadFromFile(file);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     public static void main(String[] args) {
-        Epic epic1 = new Epic("Уборка", "");
-        Epic epic2 = new Epic("Спорт", "");
+        Task task = new Task("task_name_1", "task_description_1", TaskStatus.NEW);
+        Epic epic = new Epic("epic_name_3", "epic_description_3");
+        Epic epic2 = new Epic("epic_name_4", "epic_description_4");
 
-        SubTask subTask1 = new SubTask("Помыть посуду", "Посуду помыть", TaskStatus.NEW);
-        SubTask subTask2 = new SubTask("Помыть пол", "Пол помыть", TaskStatus.NEW);
-        SubTask subTask3 = new SubTask("Пропылесосить", "Пропылесосить", TaskStatus.NEW);
+        SubTask subTask = new SubTask("subtask_name_1", "subtask_description_1", TaskStatus.NEW);
+        subTask.setCurrentEpic(epic);
+        SubTask subTask2 = new SubTask("subtask_name_2", "subtask_description_2", TaskStatus.NEW);
+        subTask2.setCurrentEpic(epic);
+        SubTask subTask3 = new SubTask("subtask_name_3", "subtask_description_3", TaskStatus.NEW);
+        subTask3.setCurrentEpic(epic2);
 
-        subTask1.setCurrentEpic(epic1);
-        subTask2.setCurrentEpic(epic1);
-        subTask3.setCurrentEpic(epic1);
-
-        taskManager.addNewEpic(epic1);
-        taskManager.addNewEpic(epic2);
-        taskManager.addNewSubtask(subTask1);
+        taskManager.addNewTask(task);
+        taskManager.addNewEpic(epic);
+        taskManager.addNewSubtask(subTask);
         taskManager.addNewSubtask(subTask2);
+        taskManager.addNewEpic(epic2);
         taskManager.addNewSubtask(subTask3);
-
-        taskManager.getEpic(epic1.getId());
-        taskManager.getEpic(epic2.getId());
-        printHistory();
-
-        taskManager.getEpic(epic2.getId());
-        taskManager.getEpic(epic1.getId());
-        taskManager.getEpic(epic1.getId());
-        printHistory();
-
-        taskManager.deleteEpic(epic1.getId());
-        printHistory();
+        printAllTasks();
     }
 
     static void printAllTasks() {
