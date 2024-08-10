@@ -1,10 +1,17 @@
 package models;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
+
 public class SubTask extends Task {
     private Epic currentEpic;
 
     public SubTask(String name, String description, TaskStatus taskStatus) {
         super(name, description, taskStatus);
+    }
+
+    public SubTask(String name, String description, TaskStatus taskStatus, Duration duration, LocalDateTime startTime) {
+        super(name, description, taskStatus, duration, startTime);
     }
 
     public Epic getCurrentEpic() {

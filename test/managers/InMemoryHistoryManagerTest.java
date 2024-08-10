@@ -44,7 +44,7 @@ public class InMemoryHistoryManagerTest {
         assertEquals(task.getDescription(), savedTask.getDescription(), "Описание задач не равны после добавления");
         assertEquals(task.getTaskStatus(), savedTask.getTaskStatus(), "Статусы задач не равны после добавления");
 
-        subTask.setCurrentEpic(epic);
+        epic.addNewSubTask(subTask);
 
         historyManager.add(task);
         assertTrue(historyManager.getHistory().contains(task), "Не удалось добавить задачу в историю");
@@ -59,6 +59,11 @@ public class InMemoryHistoryManagerTest {
         List<Task> currentHistory = historyManager.getHistory();
 
         assertEquals(currentHistory, rightHistory, "История запросов высчитывается неверно");
+
+        historyManager.add(task);
+        historyManager.add(epic);
+        historyManager.add(subTask);
+        assertEquals(3, historyManager.getHistory().size(), "История не должга хранить дубликаты");
     }
 
     @Test
@@ -88,6 +93,12 @@ public class InMemoryHistoryManagerTest {
 
         assertEquals(currentHistory, rightHistory, "Удаление из встроенного связного списка" +
                 " происходит неверно");
+    }
 
+    @Test
+    void getHistory() {
+        List<Task> history = historyManager.getHistory();
+        assertNotNull(history, "Менеджер истории не должен возвращать null, даже если история пустая");
+        assertTrue(history.isEmpty(), "История должна быть пуста");
     }
 }

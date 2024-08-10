@@ -1,8 +1,11 @@
 import managers.FileBackedTaskManager;
+import managers.InMemoryPrioritizedTasks;
 import models.*;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.Duration;
+import java.time.LocalDateTime;
 
 public class Main {
     private static final FileBackedTaskManager taskManager;
@@ -17,24 +20,28 @@ public class Main {
     }
 
     public static void main(String[] args) {
-        Task task = new Task("task_name_1", "task_description_1", TaskStatus.NEW);
-        Epic epic = new Epic("epic_name_3", "epic_description_3");
-        Epic epic2 = new Epic("epic_name_4", "epic_description_4");
+        InMemoryPrioritizedTasks prioritizedTasks = new InMemoryPrioritizedTasks();
 
-        SubTask subTask = new SubTask("subtask_name_1", "subtask_description_1", TaskStatus.NEW);
-        subTask.setCurrentEpic(epic);
-        SubTask subTask2 = new SubTask("subtask_name_2", "subtask_description_2", TaskStatus.NEW);
-        subTask2.setCurrentEpic(epic);
-        SubTask subTask3 = new SubTask("subtask_name_3", "subtask_description_3", TaskStatus.NEW);
-        subTask3.setCurrentEpic(epic2);
+        LocalDateTime[] dateTimes = new LocalDateTime[]{
+                LocalDateTime.of(2001, 1, 1, 1, 1, 1),
+                LocalDateTime.of(2002, 2, 2, 2, 2, 2),
+                LocalDateTime.of(2002, 2, 2, 3, 3, 3)};
 
-        taskManager.addNewTask(task);
-        taskManager.addNewEpic(epic);
-        taskManager.addNewSubtask(subTask);
-        taskManager.addNewSubtask(subTask2);
-        taskManager.addNewEpic(epic2);
-        taskManager.addNewSubtask(subTask3);
-        printAllTasks();
+        final Epic epic = new Epic("e_1", "1");
+        final SubTask subTask = new SubTask("s_1", "1", TaskStatus.NEW);
+
+        subTask.setStartTime(dateTimes[0]);
+        subTask.setDuration(Duration.ofDays(3));
+
+        epic.setId(1);
+        subTask.setId(2);
+
+        epic.addNewSubTask(subTask);
+        System.out.println(subTask.getCurrentEpic());
+        prioritizedTasks.addEpic(epic);
+        prioritizedTasks.addSubtask(subTask);
+
+        System.out.println(prioritizedTasks.getPrioritizedTasks());
     }
 
     static void printAllTasks() {

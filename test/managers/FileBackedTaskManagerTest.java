@@ -15,7 +15,7 @@ import java.util.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 
-public class FileBackedTaskManagerTest {
+public class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskManager> {
     static FileBackedTaskManager taskManager;
     static File testFile;
 
@@ -107,5 +107,15 @@ public class FileBackedTaskManagerTest {
         }
 
         return checkEqualTasks(epic1, epic2);
+    }
+
+    @Override
+    protected FileBackedTaskManager createTaskManager() {
+        try {
+            File tempFile = File.createTempFile("superTest", ".txt");
+            return new FileBackedTaskManager(tempFile);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
