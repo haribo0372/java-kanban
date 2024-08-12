@@ -1,5 +1,4 @@
 import managers.FileBackedTaskManager;
-import managers.InMemoryPrioritizedTasks;
 import models.*;
 
 import java.io.File;
@@ -20,28 +19,11 @@ public class Main {
     }
 
     public static void main(String[] args) {
-        InMemoryPrioritizedTasks prioritizedTasks = new InMemoryPrioritizedTasks();
+        String d = "PT5H";
+        Task task = new Task("1", "1", TaskStatus.NEW, Duration.parse(d),
+                LocalDateTime.parse("2000-01-01T01:01:01"));
 
-        LocalDateTime[] dateTimes = new LocalDateTime[]{
-                LocalDateTime.of(2001, 1, 1, 1, 1, 1),
-                LocalDateTime.of(2002, 2, 2, 2, 2, 2),
-                LocalDateTime.of(2002, 2, 2, 3, 3, 3)};
-
-        final Epic epic = new Epic("e_1", "1");
-        final SubTask subTask = new SubTask("s_1", "1", TaskStatus.NEW);
-
-        subTask.setStartTime(dateTimes[0]);
-        subTask.setDuration(Duration.ofDays(3));
-
-        epic.setId(1);
-        subTask.setId(2);
-
-        epic.addNewSubTask(subTask);
-        System.out.println(subTask.getCurrentEpic());
-        prioritizedTasks.addEpic(epic);
-        prioritizedTasks.addSubtask(subTask);
-
-        System.out.println(prioritizedTasks.getPrioritizedTasks());
+        System.out.println(task.toStringCSV());
     }
 
     static void printAllTasks() {

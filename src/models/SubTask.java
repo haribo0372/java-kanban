@@ -35,7 +35,7 @@ public class SubTask extends Task {
 
     @Override
     public String toStringCSV() {
-        String result = String.format("%s,SUBTASK,%s,%s,%s", id, name, taskStatus, description);
+        String result = String.format("%s,SUBTASK,%s,%s,%s,%s,%s", id, name, taskStatus, description, duration, startTime);
         if (currentEpic == null)
             return result + ",null";
 

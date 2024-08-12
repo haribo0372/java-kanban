@@ -104,6 +104,6 @@ public class Task {
     }
 
     public String toStringCSV() {
-        return String.format("%s,TASK,%s,%s,%s", id, name, taskStatus, description);
+        return String.format("%s,TASK,%s,%s,%s,%s,%s", id, name, taskStatus, description, duration, startTime);
     }
 }

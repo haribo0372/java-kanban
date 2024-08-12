@@ -65,6 +65,8 @@ class EpicTest {
     @Test
     void timesCalculation() {
         Epic epic = new Epic("e_1", "1");
+        assertNull(epic.getStartTime());
+        assertNull(epic.getDuration());
 
         SubTask subTask1 = new SubTask("s_1", "1", TaskStatus.NEW,
                 Duration.ofDays(3),
@@ -73,11 +75,13 @@ class EpicTest {
         SubTask subTask2 = new SubTask("s_2", "2", TaskStatus.NEW,
                 Duration.ofDays(3),
                 LocalDateTime.of(2024, 7, 7, 13, 0, 0));
+        SubTask subTask3 = new SubTask("s_3", "s_3", TaskStatus.NEW);
 
         epic.setId(1);
         subTask1.setId(2);
         subTask2.setId(3);
-        epic.addNewSubTask(subTask1, subTask2);
+        subTask3.setId(4);
+        epic.addNewSubTask(subTask1, subTask2, subTask3);
 
         assertEquals(epic.getStartTime(), subTask1.getStartTime(),
                 "Неверно вычисление времени начала выполнения эпика");

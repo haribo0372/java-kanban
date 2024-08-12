@@ -2,16 +2,14 @@ package models;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
+import java.util.*;
 
 public class Epic extends Task {
-    private final ArrayList<SubTask> subTasks;
+    private final List<SubTask> subTasks;
     private LocalDateTime endTime = LocalDateTime.MIN;
 
     public Epic(String name, String description) {
-        super(name, description, TaskStatus.NEW, Duration.ofNanos(0), LocalDateTime.MAX);
+        super(name, description, TaskStatus.NEW);
         subTasks = new ArrayList<>();
     }
 
@@ -21,12 +19,16 @@ public class Epic extends Task {
             this.subTasks.add(subTask);
             subTask.setCurrentEpic(this);
             updateStatus();
+            if (startTime == null || duration == null) {
+                startTime = subTask.getStartTime();
+                duration = subTask.getDuration();
+            }
             updateTime();
         });
     }
 
-    public ArrayList<SubTask> getSubTasks() {
-        return subTasks;
+    public List<SubTask> getSubTasks() {
+        return List.copyOf(subTasks);
     }
 
     public void updateSubTask(SubTask subTask) {
@@ -70,8 +72,13 @@ public class Epic extends Task {
     }
 
     private void updateTime() {
-        duration = Duration.ZERO;
+        if (subTasks.isEmpty()) {
+            duration = null;
+            startTime = null;
+            return;
+        }
 
+        duration = Duration.ZERO;
         subTasks.stream().filter(i -> (i.getStartTime() != null && i.getDuration() != null)).forEach(subtask -> {
             LocalDateTime currentStartTime = subtask.getStartTime();
             LocalDateTime currentEndTime = subtask.getEndTime();
@@ -104,6 +111,6 @@ public class Epic extends Task {
 
     @Override
     public String toStringCSV() {
-        return String.format("%s,EPIC,%s,%s,%s", id, name, taskStatus, description);
+        return String.format("%s,EPIC,%s,%s,%s,%s,%s", id, name, taskStatus, description, duration, startTime);
     }
 }

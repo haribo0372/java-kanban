@@ -18,6 +18,32 @@ import static org.junit.jupiter.api.Assertions.*;
 public abstract class TaskManagerTest<T extends TaskManager> {
     protected T taskManager;
 
+    final LocalDateTime[] dateTimes = new LocalDateTime[]{
+            LocalDateTime.of(2001, 1, 1, 1, 1, 1),
+            LocalDateTime.of(2002, 2, 2, 2, 2, 2),
+            LocalDateTime.of(2003, 3, 3, 3, 3, 3)};
+
+    final Duration[] durations = new Duration[]{
+            Duration.ofHours(1),
+            Duration.ofHours(2),
+            Duration.ofHours(3)};
+
+    final Task[] tasks = new Task[]{
+            new Task("1", "1", TaskStatus.NEW),
+            new Task("2", "2", TaskStatus.NEW),
+            new Task("3", "3", TaskStatus.NEW)};
+
+    final Epic[] epics = new Epic[]{
+            new Epic("1", "1"),
+            new Epic("2", "2"),
+            new Epic("3", "3")};
+
+    final SubTask[] subTasks = new SubTask[]{
+            new SubTask("1", "1", TaskStatus.NEW),
+            new SubTask("2", "2", TaskStatus.NEW),
+            new SubTask("3", "3", TaskStatus.NEW)};
+
+
     @BeforeEach
     public void setUp() {
         taskManager = createTaskManager();
@@ -84,11 +110,6 @@ public abstract class TaskManagerTest<T extends TaskManager> {
 
     @Test
     void deleteTask() {
-        final Task[] tasks = new Task[]{
-                new Task("1", "1", TaskStatus.NEW),
-                new Task("2", "2", TaskStatus.NEW),
-                new Task("3", "3", TaskStatus.NEW)};
-
         List<Integer> taskIds = Arrays.stream(tasks).map(i -> taskManager.addNewTask(i)).toList();
 
         assertFalse(taskManager.getTasks().isEmpty(), "Задачи не добавились");
@@ -104,16 +125,6 @@ public abstract class TaskManagerTest<T extends TaskManager> {
 
     @Test
     void deleteEpic() {
-        final Epic[] epics = new Epic[]{
-                new Epic("1", "1"),
-                new Epic("2", "2"),
-                new Epic("3", "3")};
-
-        final SubTask[] subTasks = new SubTask[]{
-                new SubTask("1", "1", TaskStatus.NEW),
-                new SubTask("2", "2", TaskStatus.NEW),
-                new SubTask("3", "3", TaskStatus.NEW)};
-
         Iterator<SubTask> subTaskIterator1 = Arrays.stream(subTasks).iterator();
 
         List<Integer> epicIds = Arrays.stream(epics).map(epic -> {
@@ -148,8 +159,8 @@ public abstract class TaskManagerTest<T extends TaskManager> {
 
     @Test
     void deleteSubTask() {
-        Epic epic = new Epic("name_1", "description_1");
-        SubTask subTask = new SubTask("name_1", "description_1", TaskStatus.NEW);
+        Epic epic = epics[0];
+        SubTask subTask = subTasks[0];
         subTask.setCurrentEpic(epic);
 
         taskManager.addNewEpic(epic);
@@ -161,11 +172,6 @@ public abstract class TaskManagerTest<T extends TaskManager> {
 
     @Test
     void getHistory() {
-        final Task[] tasks = new Task[]{
-                new Task("1", "1", TaskStatus.NEW),
-                new Task("2", "2", TaskStatus.NEW),
-                new Task("3", "3", TaskStatus.NEW)};
-
         assertNotNull(taskManager.getHistory(), "Менеджер задач не должен возвращать null в качестве истории просмотра");
         List<Integer> taskIds = Arrays.stream(tasks).map(i -> taskManager.addNewTask(i)).toList();
 
@@ -174,20 +180,47 @@ public abstract class TaskManagerTest<T extends TaskManager> {
     }
 
     @Test
-    void getPrioritizedTasks() {
-        final LocalDateTime[] dateTimes = new LocalDateTime[]{
-                LocalDateTime.of(2001, 1, 1, 1, 1, 1),
-                LocalDateTime.of(2002, 2, 2, 2, 2, 2),
-                LocalDateTime.of(2003, 3, 3, 3, 3, 3)};
+    void prioritizedTasksTest() {
+        String message1 = "Менеджер задач не должен возвращать null в качестве списка приорететных задач";
+        assertNotNull(taskManager.getPrioritizedTasks(), message1);
+        assertTrue(taskManager.getPrioritizedTasks().isEmpty(), message1);
 
-        final Task[] tasks = new Task[]{
-                new Task("1", "1", TaskStatus.NEW, Duration.ofHours(1), dateTimes[0]),
-                new Task("2", "2", TaskStatus.NEW, Duration.ofHours(1), dateTimes[1]),
-                new Task("3", "3", TaskStatus.NEW, Duration.ofHours(1), dateTimes[2])};
+        Task task = tasks[0];
+        Epic epic = epics[0];
+        SubTask subTask1 = subTasks[0];
+        SubTask subTask2 = subTasks[1];
+        epic.addNewSubTask(subTask1, subTask2);
 
-        Arrays.stream(tasks).forEach(i -> taskManager.addNewTask(i));
-        assertNotNull(taskManager.getPrioritizedTasks());
-        assertFalse(taskManager.getPrioritizedTasks().isEmpty(), "Приоритетные задачи неверно сохраняются");
+        taskManager.addNewTask(task);
+        assertTrue(taskManager.getPrioritizedTasks().isEmpty(), "Задачи не имеющие времени добавляются в список приорететных задач");
+
+        taskManager.addNewEpic(epic);
+        assertTrue(taskManager.getPrioritizedTasks().isEmpty(), "Эпики не должны добавляться в список приорететных задач");
+
+        taskManager.addNewSubtask(subTask1);
+        assertTrue(taskManager.getPrioritizedTasks().isEmpty(), "Подзадачи не имеющие времени добавляются в список приорететных задач");
+
+        String message2 = "Задачи неверно сортируются";
+        task.setStartTime(dateTimes[0]);
+        task.setDuration(durations[0]);
+        subTask1.setStartTime(dateTimes[0]);
+        subTask1.setDuration(durations[0]);
+
+        taskManager.addNewTask(task);
+        taskManager.addNewSubtask(subTask1);
+        assertEquals(1, taskManager.getPrioritizedTasks().size(), message2);
+
+        subTask1.setStartTime(task.getEndTime());
+        taskManager.addNewSubtask(subTask1);
+        List<Task> tempList = taskManager.getPrioritizedTasks();
+        assertEquals(2, tempList.size(), message2);
+        assertEquals(task, tempList.getFirst(), message2);
+        assertEquals(subTask1, tempList.getLast(), message2);
+
+        subTask1.setStartTime(task.getStartTime());
+        taskManager.updateSubtask(subTask1);
+        assertEquals(1, taskManager.getPrioritizedTasks().size(), message2);
+        assertEquals(task, taskManager.getPrioritizedTasks().getFirst(), message2);
     }
 }
 

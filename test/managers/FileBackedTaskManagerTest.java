@@ -10,6 +10,8 @@ import org.junit.jupiter.api.Test;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -19,7 +21,8 @@ public class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskMan
     static FileBackedTaskManager taskManager;
     static File testFile;
 
-    static Task task;
+    static Task task1;
+    static Task task2;
     static Epic epic1;
     static Epic epic2;
     static SubTask subTask1;
@@ -31,11 +34,14 @@ public class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskMan
         testFile = File.createTempFile("test", ".txt");
         taskManager = new FileBackedTaskManager(testFile);
 
-        task = new Task("task_name_1", "task_description_1", TaskStatus.NEW);
+        task1 = new Task("task_name_1", "task_description_1", TaskStatus.NEW);
+        task2 = new Task("task_name_2", "task_description_2", TaskStatus.NEW,
+                Duration.ofHours(3), LocalDateTime.of(2000, 1, 1, 1, 1, 1));
         epic1 = new Epic("epic_name_1", "epic_description_1");
         epic2 = new Epic("epic_name_2", "epic_description_2");
 
-        subTask1 = new SubTask("subtask_name_1", "subtask_description_1", TaskStatus.NEW);
+        subTask1 = new SubTask("subtask_name_1", "subtask_description_1", TaskStatus.NEW,
+                Duration.ofHours(3), LocalDateTime.of(2001, 1, 1, 1, 1, 1));
         subTask1.setCurrentEpic(epic1);
 
         subTask2 = new SubTask("subtask_name_2", "subtask_description_2", TaskStatus.NEW);
@@ -44,7 +50,8 @@ public class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskMan
         subTask3 = new SubTask("subtask_name_3", "subtask_description_3", TaskStatus.NEW);
         subTask3.setCurrentEpic(epic2);
 
-        taskManager.addNewTask(task);
+        taskManager.addNewTask(task1);
+        taskManager.addNewTask(task2);
         taskManager.addNewEpic(epic1);
         taskManager.addNewSubtask(subTask1);
         taskManager.addNewSubtask(subTask2);
@@ -54,7 +61,7 @@ public class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskMan
 
     @Test
     void saveTasksTest() throws IOException {
-        Task[] tasks = new Task[]{task, epic1, epic2, subTask1, subTask2, subTask3};
+        Task[] tasks = new Task[]{task1, task2, epic1, epic2, subTask1, subTask2, subTask3};
         String[] strings = Files.readString(testFile.toPath()).split("\n");
 
         String message = "Задачи неправильно сохраняются в файл";
@@ -68,14 +75,16 @@ public class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskMan
         FileBackedTaskManager restoredManager = FileBackedTaskManager.loadFromFile(testFile);
         String message = "Неудача при восстановлении задач из файла";
 
-        Task restoredTask = restoredManager.getTask(task.getId());
+        Task restoredTask1 = restoredManager.getTask(task1.getId());
+        Task restoredTask2 = restoredManager.getTask(task2.getId());
         Epic restoredEpic1 = restoredManager.getEpic(epic1.getId());
         Epic restoredEpic2 = restoredManager.getEpic(epic2.getId());
         SubTask restoredSubtask1 = restoredManager.getSubtask(subTask1.getId());
         SubTask restoredSubtask2 = restoredManager.getSubtask(subTask2.getId());
         SubTask restoredSubtask3 = restoredManager.getSubtask(subTask3.getId());
 
-        assertTrue(checkEqualTasks(restoredTask, task), message);
+        assertTrue(checkEqualTasks(restoredTask1, task1), message);
+        assertTrue(checkEqualTasks(restoredTask2, task2), message);
         assertTrue(checkEqualEpic(restoredEpic1, epic1), message);
         assertTrue(checkEqualEpic(restoredEpic2, epic2), message);
         assertTrue(checkEqualSubTask(restoredSubtask1, subTask1), message);
@@ -86,8 +95,10 @@ public class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskMan
     boolean checkEqualTasks(Task t1, Task t2) {
         if (!Objects.equals(t1.getId(), t2.getId())) return false;
         if (t1.getTaskStatus() != t2.getTaskStatus()) return false;
-        if (!t1.getName().equals(t2.getName())) return false;
-        return t1.getDescription().equals(t2.getDescription());
+        if (!Objects.equals(t1.getName(), t2.getName())) return false;
+        if (!Objects.equals(t1.getStartTime(), t2.getStartTime())) return false;
+        if (!Objects.equals(t1.getDuration(), t2.getDuration())) return false;
+        return Objects.equals(t1.getDescription(), t2.getDescription());
     }
 
     boolean checkEqualSubTask(SubTask subTask1, SubTask subTask2) {

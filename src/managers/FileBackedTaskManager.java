@@ -12,11 +12,13 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 public class FileBackedTaskManager extends InMemoryTaskManager {
-    private File file;
+    private final File file;
 
     public FileBackedTaskManager(File file) {
         this.file = file;
@@ -50,13 +52,16 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         Epic epic1 = new Epic("epic_name_1", "epic_description_1");
         Epic epic2 = new Epic("epic_name_2", "epic_description_2");
 
-        SubTask subTask1 = new SubTask("subtask_name_1", "subtask_description_1", TaskStatus.NEW);
+        SubTask subTask1 = new SubTask("subtask_name_1", "subtask_description_1", TaskStatus.NEW,
+                Duration.ofHours(3), LocalDateTime.of(1, 1, 1, 1, 1, 1));
         subTask1.setCurrentEpic(epic1);
 
-        SubTask subTask2 = new SubTask("subtask_name_2", "subtask_description_2", TaskStatus.NEW);
+        SubTask subTask2 = new SubTask("subtask_name_2", "subtask_description_2", TaskStatus.NEW,
+                Duration.ofHours(3), LocalDateTime.of(2, 1, 1, 1, 1, 1));
         subTask2.setCurrentEpic(epic1);
 
-        SubTask subTask3 = new SubTask("subtask_name_3", "subtask_description_3", TaskStatus.NEW);
+        SubTask subTask3 = new SubTask("subtask_name_3", "subtask_description_3", TaskStatus.NEW,
+                Duration.ofHours(3), LocalDateTime.of(3, 1, 1, 1, 1, 1));
         subTask3.setCurrentEpic(epic2);
 
         taskManager.addNewTask(task);
@@ -82,6 +87,12 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                 if (currentTask[1].equals("TASK")) {
                     Task task = new Task(currentTask[2], currentTask[4], validateTaskStatus(currentTask[3]));
                     task.setId(id);
+                    if (!(currentTask[5].equals("null") | currentTask[6].equals("null"))) {
+                        task.setDuration(Duration.parse(currentTask[5]));
+                        task.setStartTime(LocalDateTime.parse(currentTask[6]));
+                        if (backedTaskManager.taskIsValidateInTime(task))
+                            backedTaskManager.prioritizedTasks.add(task);
+                    }
                     backedTaskManager.tasks.put(task.getId(), task);
                 } else if (currentTask[1].equals("EPIC")) {
                     Epic epic = new Epic(currentTask[2], currentTask[4]);
@@ -90,10 +101,13 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                 } else if (currentTask[1].equals("SUBTASK")) {
                     SubTask subTask = new SubTask(currentTask[2], currentTask[4], validateTaskStatus(currentTask[3]));
                     subTask.setId(id);
-
-                    if (!currentTask[5].equals("null")) {
+                    if (!(currentTask[5].equals("null") | currentTask[6].equals("null"))) {
+                        subTask.setDuration(Duration.parse(currentTask[5]));
+                        subTask.setStartTime(LocalDateTime.parse(currentTask[6]));
+                    }
+                    if (!currentTask[7].equals("null")) {
                         subTaskArrayList.add(subTask);
-                        epicsId.add(Integer.parseInt(currentTask[5]));
+                        epicsId.add(Integer.parseInt(currentTask[7]));
                     }
                 }
                 if (id > maxForSerial) maxForSerial = id;
@@ -104,9 +118,10 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                 Epic epic = backedTaskManager.epics.get(epicsId.get(i));
                 SubTask subTask = subTaskArrayList.get(i);
                 if (epic != null) {
-                    subTask.setCurrentEpic(epic);
                     epic.addNewSubTask(subTask);
                     backedTaskManager.subtasks.put(subTask.getId(), subTask);
+                    if (backedTaskManager.taskIsValidateInTime(subTask))
+                        backedTaskManager.prioritizedTasks.add(subTask);
                 }
             }
 
@@ -126,7 +141,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         tasks.addAll(super.getSubtasks());
 
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
-            writer.write("id,type,name,status,description,epic\n");
+            writer.write("id,type,name,status,description,duration,start,epic\n");
 
             for (Task i : tasks) writer.write(i.toStringCSV() + '\n');
 
