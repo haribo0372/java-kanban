@@ -31,8 +31,7 @@ public class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskMan
 
     @BeforeAll
     static void managerPreparation() throws IOException {
-//        testFile = File.createTempFile("test", ".txt");
-        testFile = new File("test.txt");
+        testFile = File.createTempFile("test", ".txt");
         taskManager = new FileBackedTaskManager(testFile);
 
         task1 = new Task("task_name_1", "task_description_1", TaskStatus.NEW);

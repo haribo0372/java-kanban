@@ -119,15 +119,19 @@ public class InMemoryTaskManager implements TaskManager {
     public void updateTask(Task task) {
         int id = task.getId();
         if (tasks.get(id) == null) return;
-        tasks.put(id, task);
         if (taskHasNoTime(task)) {
             prioritizedTasks.removeIf(task::equals);
+            tasks.put(id, task);
             return;
         }
         if (taskIsValidateInTime(task) && prioritizedTasks.contains(task)) {
+            tasks.put(id, task);
             prioritizedTasks.removeIf(task::equals);
             prioritizedTasks.add(task);
-        } else prioritizedTasks.removeIf(task::equals);
+        } else {
+            prioritizedTasks.removeIf(task::equals);
+            tasks.remove(id);
+        }
     }
 
     @Override
@@ -147,16 +151,20 @@ public class InMemoryTaskManager implements TaskManager {
         if (storageSubtask == null) return;
         Epic currentEpic = getEpic(storageSubtask.getCurrentEpic().getId());
         currentEpic.updateSubTask(subtask);
-        subtasks.put(id, subtask);
 
         if (taskHasNoTime(subtask)) {
+            subtasks.put(id, subtask);
             prioritizedTasks.removeIf(subtask::equals);
             return;
         }
         if (taskIsValidateInTime(subtask) && prioritizedTasks.contains(subtask)) {
             prioritizedTasks.removeIf(subtask::equals);
             prioritizedTasks.add(subtask);
-        } else prioritizedTasks.removeIf(subtask::equals);
+            subtasks.put(id, subtask);
+        } else {
+            prioritizedTasks.removeIf(subtask::equals);
+            subtasks.remove(id);
+        }
     }
 
     @Override
