@@ -66,10 +66,19 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public int addNewTask(Task task) {
-        int id = serial++;
-        task.setId(id);
-        tasks.put(id, task);
-        if (taskIsValidateInTime(task)) prioritizedTasks.add(task);
+        int id = -1;
+        if (taskHasNoTime(task)) {
+            id = serial++;
+            task.setId(id);
+            tasks.put(id, task);
+            return id;
+        } else if (taskIsValidateInTime(task)) {
+            id = serial++;
+            task.setId(id);
+            tasks.put(id, task);
+            prioritizedTasks.add(task);
+            return id;
+        }
         return id;
     }
 
@@ -89,13 +98,21 @@ public class InMemoryTaskManager implements TaskManager {
         int currentEpicId = currentEpic.getId();
         if (epics.get(currentEpicId) == null) return -1;
 
-        int id = serial++;
-        subtask.setId(id);
-        currentEpic.addNewSubTask(subtask);
-        subtasks.put(id, subtask);
-        if (taskIsValidateInTime(subtask)) prioritizedTasks.add(subtask);
+        int id  = -1;
+        if (taskHasNoTime(subtask)) {
+            id = serial++;
+            subtask.setId(id);
+            currentEpic.addNewSubTask(subtask);
+            subtasks.put(id, subtask);
+        } else if (taskIsValidateInTime(subtask)) {
+            id = serial++;
+            subtask.setId(id);
+            currentEpic.addNewSubTask(subtask);
+            subtasks.put(id, subtask);
+            prioritizedTasks.add(subtask);
+        }
 
-        return subtask.getId();
+        return id;
     }
 
     @Override
@@ -104,13 +121,13 @@ public class InMemoryTaskManager implements TaskManager {
         if (tasks.get(id) == null) return;
         tasks.put(id, task);
         if (taskHasNoTime(task)) {
-            prioritizedTasks.remove(task);
+            prioritizedTasks.removeIf(task::equals);
             return;
         }
         if (taskIsValidateInTime(task) && prioritizedTasks.contains(task)) {
-            prioritizedTasks.remove(task);
+            prioritizedTasks.removeIf(task::equals);
             prioritizedTasks.add(task);
-        } else prioritizedTasks.remove(task);
+        } else prioritizedTasks.removeIf(task::equals);
     }
 
     @Override
@@ -221,14 +238,13 @@ public class InMemoryTaskManager implements TaskManager {
         return task.getStartTime() == null || task.getDuration() == null;
     }
 
-    protected static boolean tasksOverlap(Task t1, Task t2) {
+    public static boolean tasksOverlap(Task t1, Task t2) {
         LocalDateTime startTime1 = t1.getStartTime();
         LocalDateTime startTime2 = t2.getStartTime();
         LocalDateTime endTime1 = t1.getEndTime();
         LocalDateTime endTime2 = t2.getEndTime();
-        boolean stsEquals = startTime1.isEqual(startTime2);
-        return ((startTime1.isBefore(startTime2) || stsEquals) && endTime1.isBefore(startTime2)) ||
-                ((startTime2.isBefore(startTime1) || stsEquals) && endTime2.isBefore(startTime1));
+
+        return startTime1.isBefore(endTime2) && startTime2.isBefore(endTime1);
     }
 
     @Override

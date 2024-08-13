@@ -31,7 +31,8 @@ public class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskMan
 
     @BeforeAll
     static void managerPreparation() throws IOException {
-        testFile = File.createTempFile("test", ".txt");
+//        testFile = File.createTempFile("test", ".txt");
+        testFile = new File("test.txt");
         taskManager = new FileBackedTaskManager(testFile);
 
         task1 = new Task("task_name_1", "task_description_1", TaskStatus.NEW);
@@ -116,7 +117,7 @@ public class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskMan
         for (int i = 0; i < list1.size(); i++) {
             if (!checkEqualSubTask(list1.get(i), list2.get(i))) return false;
         }
-
+        if (!Objects.equals(epic1.getEndTime(), epic2.getEndTime())) return false;
         return checkEqualTasks(epic1, epic2);
     }
 

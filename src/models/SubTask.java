@@ -26,10 +26,11 @@ public class SubTask extends Task {
     public String toString() {
         return "SubTask{" +
                 "id=" + id +
-                ", currentEpic=" + currentEpic.getId() +
                 ", name='" + name + '\'' +
                 ", description='" + description + '\'' +
                 ", taskStatus=" + taskStatus +
+                ", duration=" + duration +
+                ", startTime=" + startTime +
                 '}';
     }
 

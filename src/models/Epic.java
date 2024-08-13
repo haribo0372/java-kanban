@@ -6,7 +6,7 @@ import java.util.*;
 
 public class Epic extends Task {
     private final List<SubTask> subTasks;
-    private LocalDateTime endTime = LocalDateTime.MIN;
+    private LocalDateTime endTime;
 
     public Epic(String name, String description) {
         super(name, description, TaskStatus.NEW);
@@ -22,6 +22,8 @@ public class Epic extends Task {
             if (startTime == null || duration == null) {
                 startTime = subTask.getStartTime();
                 duration = subTask.getDuration();
+                if (startTime != null && duration != null)
+                    endTime = startTime.plus(duration);
             }
             updateTime();
         });
@@ -75,26 +77,34 @@ public class Epic extends Task {
         if (subTasks.isEmpty()) {
             duration = null;
             startTime = null;
+            endTime = null;
             return;
         }
 
-        duration = Duration.ZERO;
-        subTasks.stream().filter(i -> (i.getStartTime() != null && i.getDuration() != null)).forEach(subtask -> {
-            LocalDateTime currentStartTime = subtask.getStartTime();
-            LocalDateTime currentEndTime = subtask.getEndTime();
-            Duration currentDuration = subtask.getDuration();
+        if (subTasks.stream().anyMatch(i -> (i.getStartTime() != null && i.getDuration() != null))) {
+            duration = Duration.ZERO;
+            subTasks.stream().filter(i -> (i.getStartTime() != null && i.getDuration() != null)).forEach(subtask -> {
+                LocalDateTime currentStartTime = subtask.getStartTime();
+                LocalDateTime currentEndTime = subtask.getEndTime();
+                Duration currentDuration = subtask.getDuration();
 
-            if (startTime.isAfter(currentStartTime))
-                startTime = LocalDateTime.from(currentStartTime);
-            if (endTime.isBefore(currentEndTime))
-                endTime = LocalDateTime.from(currentEndTime);
-            duration = duration.plus(currentDuration);
-        });
+                if (startTime.isAfter(currentStartTime))
+                    startTime = LocalDateTime.from(currentStartTime);
+                if (endTime.isBefore(currentEndTime))
+                    endTime = LocalDateTime.from(currentEndTime);
+                duration = duration.plus(currentDuration);
+            });
+        } else {
+            duration = null;
+            startTime = null;
+            endTime = null;
+        }
     }
 
     @Override
     public LocalDateTime getEndTime() {
-        return LocalDateTime.from(endTime);
+        if (endTime != null) return LocalDateTime.from(endTime);
+        return null;
     }
 
     @Override
@@ -105,6 +115,8 @@ public class Epic extends Task {
                 ", name='" + name + '\'' +
                 ", description='" + description + '\'' +
                 ", taskStatus=" + taskStatus +
+                ", duration=" + duration +
+                ", startTime=" + startTime +
                 ", subTasksId=" + Arrays.toString(arrayWithSubTasksId) +
                 '}';
     }

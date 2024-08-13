@@ -87,11 +87,10 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                 if (currentTask[1].equals("TASK")) {
                     Task task = new Task(currentTask[2], currentTask[4], validateTaskStatus(currentTask[3]));
                     task.setId(id);
-                    if (!(currentTask[5].equals("null") | currentTask[6].equals("null"))) {
+                    if (!currentTask[5].equals("null") && !currentTask[6].equals("null")) {
                         task.setDuration(Duration.parse(currentTask[5]));
                         task.setStartTime(LocalDateTime.parse(currentTask[6]));
-                        if (backedTaskManager.taskIsValidateInTime(task))
-                            backedTaskManager.prioritizedTasks.add(task);
+                        backedTaskManager.prioritizedTasks.add(task);
                     }
                     backedTaskManager.tasks.put(task.getId(), task);
                 } else if (currentTask[1].equals("EPIC")) {
@@ -101,7 +100,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                 } else if (currentTask[1].equals("SUBTASK")) {
                     SubTask subTask = new SubTask(currentTask[2], currentTask[4], validateTaskStatus(currentTask[3]));
                     subTask.setId(id);
-                    if (!(currentTask[5].equals("null") | currentTask[6].equals("null"))) {
+                    if (!currentTask[5].equals("null") && !currentTask[6].equals("null")) {
                         subTask.setDuration(Duration.parse(currentTask[5]));
                         subTask.setStartTime(LocalDateTime.parse(currentTask[6]));
                     }
@@ -120,7 +119,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                 if (epic != null) {
                     epic.addNewSubTask(subTask);
                     backedTaskManager.subtasks.put(subTask.getId(), subTask);
-                    if (backedTaskManager.taskIsValidateInTime(subTask))
+                    if (!backedTaskManager.taskHasNoTime(subTask))
                         backedTaskManager.prioritizedTasks.add(subTask);
                 }
             }
