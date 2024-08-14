@@ -215,11 +215,6 @@ public abstract class TaskManagerTest<T extends TaskManager> {
         assertEquals(1, taskManager.getPrioritizedTasks().size(), message2);
 
         subTask1.setStartTime(task.getEndTime().plusYears(1));
-        taskManager.getPrioritizedTasks().stream().forEach(i -> {
-            if (InMemoryTaskManager.tasksOverlap(i, subTask1)){
-                System.out.printf("%s\n%s\n", i, subTask1);
-            }
-        });
         taskManager.addNewSubtask(subTask1);
         List<Task> tempList = taskManager.getPrioritizedTasks();
 
@@ -229,7 +224,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
 
         subTask1.setStartTime(task.getStartTime());
         taskManager.updateSubtask(subTask1);
-        assertEquals(1, taskManager.getPrioritizedTasks().size(), message2);
+        assertEquals(2, taskManager.getPrioritizedTasks().size(), message2);
         assertEquals(task, taskManager.getPrioritizedTasks().getFirst(), message2);
     }
 }

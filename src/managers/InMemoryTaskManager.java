@@ -124,13 +124,10 @@ public class InMemoryTaskManager implements TaskManager {
             tasks.put(id, task);
             return;
         }
-        if (taskIsValidateInTime(task) && prioritizedTasks.contains(task)) {
+        if (taskIsValidateInTime(task)) {
             tasks.put(id, task);
             prioritizedTasks.removeIf(task::equals);
             prioritizedTasks.add(task);
-        } else {
-            prioritizedTasks.removeIf(task::equals);
-            tasks.remove(id);
         }
     }
 
@@ -157,13 +154,10 @@ public class InMemoryTaskManager implements TaskManager {
             prioritizedTasks.removeIf(subtask::equals);
             return;
         }
-        if (taskIsValidateInTime(subtask) && prioritizedTasks.contains(subtask)) {
+        if (taskIsValidateInTime(subtask)) {
             prioritizedTasks.removeIf(subtask::equals);
             prioritizedTasks.add(subtask);
             subtasks.put(id, subtask);
-        } else {
-            prioritizedTasks.removeIf(subtask::equals);
-            subtasks.remove(id);
         }
     }
 
@@ -246,7 +240,7 @@ public class InMemoryTaskManager implements TaskManager {
         return task.getStartTime() == null || task.getDuration() == null;
     }
 
-    public static boolean tasksOverlap(Task t1, Task t2) {
+    protected boolean tasksOverlap(Task t1, Task t2) {
         LocalDateTime startTime1 = t1.getStartTime();
         LocalDateTime startTime2 = t2.getStartTime();
         LocalDateTime endTime1 = t1.getEndTime();
