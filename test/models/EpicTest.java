@@ -67,6 +67,7 @@ class EpicTest {
         Epic epic = new Epic("e_1", "1");
         assertNull(epic.getStartTime());
         assertNull(epic.getDuration());
+        assertNull(epic.getEndTime());
 
         SubTask subTask1 = new SubTask("s_1", "1", TaskStatus.NEW,
                 Duration.ofDays(3),
@@ -91,5 +92,17 @@ class EpicTest {
 
         assertEquals(epic.getDuration(), subTask1.getDuration().plus(subTask2.getDuration()),
                 "Неверно вычисление продолжительности выполнения эпика");
+
+        assertEquals(3, epic.getSubTasks().size(),
+                "Неверное кол-во добавленных подзадач");
+
+        epic.removeSubTask(subTask1);
+        epic.updateTime();
+        assertEquals(epic.getStartTime(), subTask2.getStartTime(),
+                "Неверно вычисление времени начала выполнения эпика");
+
+        assertEquals(epic.getEndTime(), subTask2.getEndTime(),
+                "Неверно вычисление времени конца выполнения эпика");
+
     }
 }

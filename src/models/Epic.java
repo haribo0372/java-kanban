@@ -73,7 +73,7 @@ public class Epic extends Task {
         this.taskStatus = ts;
     }
 
-    private void updateTime() {
+    public void updateTime() {
         if (subTasks.isEmpty()) {
             duration = null;
             startTime = null;
@@ -83,6 +83,8 @@ public class Epic extends Task {
 
         if (subTasks.stream().anyMatch(i -> (i.getStartTime() != null && i.getDuration() != null))) {
             duration = Duration.ZERO;
+            startTime = LocalDateTime.MAX;
+            endTime = LocalDateTime.MIN;
             subTasks.stream().filter(i -> (i.getStartTime() != null && i.getDuration() != null)).forEach(subtask -> {
                 LocalDateTime currentStartTime = subtask.getStartTime();
                 LocalDateTime currentEndTime = subtask.getEndTime();
