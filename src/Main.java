@@ -3,6 +3,8 @@ import models.*;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.Duration;
+import java.time.LocalDateTime;
 
 public class Main {
     private static final FileBackedTaskManager taskManager;
@@ -17,24 +19,11 @@ public class Main {
     }
 
     public static void main(String[] args) {
-        Task task = new Task("task_name_1", "task_description_1", TaskStatus.NEW);
-        Epic epic = new Epic("epic_name_3", "epic_description_3");
-        Epic epic2 = new Epic("epic_name_4", "epic_description_4");
+        String d = "PT5H";
+        Task task = new Task("1", "1", TaskStatus.NEW, Duration.parse(d),
+                LocalDateTime.parse("2000-01-01T01:01:01"));
 
-        SubTask subTask = new SubTask("subtask_name_1", "subtask_description_1", TaskStatus.NEW);
-        subTask.setCurrentEpic(epic);
-        SubTask subTask2 = new SubTask("subtask_name_2", "subtask_description_2", TaskStatus.NEW);
-        subTask2.setCurrentEpic(epic);
-        SubTask subTask3 = new SubTask("subtask_name_3", "subtask_description_3", TaskStatus.NEW);
-        subTask3.setCurrentEpic(epic2);
-
-        taskManager.addNewTask(task);
-        taskManager.addNewEpic(epic);
-        taskManager.addNewSubtask(subTask);
-        taskManager.addNewSubtask(subTask2);
-        taskManager.addNewEpic(epic2);
-        taskManager.addNewSubtask(subTask3);
-        printAllTasks();
+        System.out.println(task.toStringCSV());
     }
 
     static void printAllTasks() {

@@ -1,10 +1,17 @@
 package models;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
+
 public class SubTask extends Task {
     private Epic currentEpic;
 
     public SubTask(String name, String description, TaskStatus taskStatus) {
         super(name, description, taskStatus);
+    }
+
+    public SubTask(String name, String description, TaskStatus taskStatus, Duration duration, LocalDateTime startTime) {
+        super(name, description, taskStatus, duration, startTime);
     }
 
     public Epic getCurrentEpic() {
@@ -19,16 +26,17 @@ public class SubTask extends Task {
     public String toString() {
         return "SubTask{" +
                 "id=" + id +
-                ", currentEpic=" + currentEpic.getId() +
                 ", name='" + name + '\'' +
                 ", description='" + description + '\'' +
                 ", taskStatus=" + taskStatus +
+                ", duration=" + duration +
+                ", startTime=" + startTime +
                 '}';
     }
 
     @Override
     public String toStringCSV() {
-        String result = String.format("%s,SUBTASK,%s,%s,%s", id, name, taskStatus, description);
+        String result = String.format("%s,SUBTASK,%s,%s,%s,%s,%s", id, name, taskStatus, description, duration, startTime);
         if (currentEpic == null)
             return result + ",null";
 

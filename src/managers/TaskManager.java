@@ -37,6 +37,8 @@ public interface TaskManager {
 
     void updateHistory(Task task);
 
+    List<Task> getPrioritizedTasks();
+
     void deleteTask(int id);
 
     void deleteEpic(int id);

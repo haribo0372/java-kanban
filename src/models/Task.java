@@ -1,16 +1,30 @@
 package models;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.util.Objects;
+
 public class Task {
 
     protected Integer id;
     protected String name;
     protected String description;
     protected TaskStatus taskStatus;
+    protected Duration duration;
+    protected LocalDateTime startTime;
 
     public Task(String name, String description, TaskStatus taskStatus) {
         this.name = name;
         this.description = description;
         this.taskStatus = taskStatus;
+    }
+
+    public Task(String name, String description, TaskStatus taskStatus, Duration duration, LocalDateTime startTime) {
+        this.name = name;
+        this.description = description;
+        this.taskStatus = taskStatus;
+        this.duration = duration;
+        this.startTime = startTime;
     }
 
     public String getName() {
@@ -33,8 +47,24 @@ public class Task {
         return taskStatus;
     }
 
-    public void setStatus(TaskStatus taskStatus) {
+    public void setTaskStatus(TaskStatus taskStatus) {
         this.taskStatus = taskStatus;
+    }
+
+    public Duration getDuration() {
+        return duration;
+    }
+
+    public void setDuration(Duration duration) {
+        this.duration = duration;
+    }
+
+    public LocalDateTime getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(LocalDateTime startTime) {
+        this.startTime = startTime;
     }
 
     public Integer getId() {
@@ -45,12 +75,17 @@ public class Task {
         this.id = id;
     }
 
+
+    public LocalDateTime getEndTime() {
+        return startTime.plus(duration);
+    }
+
     @Override
     public boolean equals(Object object) {
         if (this == object) return true;
         if (object == null || getClass() != object.getClass()) return false;
         Task task = (Task) object;
-        return task.id == this.id;
+        return Objects.equals(task.id, this.id);
     }
 
     @Override
@@ -65,10 +100,12 @@ public class Task {
                 ", name='" + name + '\'' +
                 ", description='" + description + '\'' +
                 ", taskStatus=" + taskStatus +
+                ", duration=" + duration +
+                ", startTime=" + startTime +
                 '}';
     }
 
     public String toStringCSV() {
-        return String.format("%s,TASK,%s,%s,%s", id, name, taskStatus, description);
+        return String.format("%s,TASK,%s,%s,%s,%s,%s", id, name, taskStatus, description, duration, startTime);
     }
 }
