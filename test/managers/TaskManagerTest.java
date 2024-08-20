@@ -56,7 +56,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
         Task task = new Task("name_1", "description_1", TaskStatus.NEW);
         final int taskId = taskManager.addNewTask(task);
 
-        final Task savedTask = taskManager.getTask(taskId);
+        final Task savedTask = taskManager.getTask(taskId).get();
 
         assertNotNull(savedTask, "Задача не найдена.");
         assertEquals(task, savedTask, "Задачи не совпадают.");
@@ -73,7 +73,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
         Epic epic = new Epic("name_1", "description_1");
         final int epicId = taskManager.addNewEpic(epic);
 
-        final Epic savedEpic = taskManager.getEpic(epicId);
+        final Epic savedEpic = taskManager.getEpic(epicId).get();
 
         assertNotNull(savedEpic, "Эпик не найден.");
         assertEquals(epic, savedEpic, "Эпики не совпадают.");
@@ -94,7 +94,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
         final int currentEpicId = taskManager.addNewEpic(epic);
         final int subTaskId = taskManager.addNewSubtask(subTask);
 
-        final SubTask savedSubTask = taskManager.getSubtask(subTaskId);
+        final SubTask savedSubTask = taskManager.getSubtask(subTaskId).get();
 
         assertNotNull(savedSubTask, "Подзадача не найдена.");
         assertEquals(subTask, savedSubTask, "Подзадачи не совпадают.");

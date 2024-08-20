@@ -5,6 +5,7 @@ import models.SubTask;
 import models.Task;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface TaskManager {
     List<Task> getHistory();
@@ -17,11 +18,11 @@ public interface TaskManager {
 
     List<SubTask> getEpicSubtasks(int epicId);
 
-    Task getTask(int id);
+    Optional<Task> getTask(int id);
 
-    SubTask getSubtask(int id);
+    Optional<SubTask> getSubtask(int id);
 
-    Epic getEpic(int id);
+    Optional<Epic> getEpic(int id);
 
     int addNewTask(Task task);
 
