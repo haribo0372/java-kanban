@@ -34,6 +34,7 @@ public class TasksHttpHandler extends BaseHttpHandler implements HttpHandler {
                 break;
             case DELETE_TASK:
                 handleDeleteTask(exchange);
+                break;
             default:
                 writeResponse(exchange, "Не найдено", 404);
         }

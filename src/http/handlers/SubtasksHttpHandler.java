@@ -33,6 +33,7 @@ public class SubtasksHttpHandler extends BaseHttpHandler implements HttpHandler 
                 break;
             case DELETE_SUBTASK:
                 handleDeleteSubtask(exchange);
+                break;
             default:
                 writeResponse(exchange, "Не найдено", 404);
         }
