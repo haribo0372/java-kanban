@@ -75,13 +75,13 @@ public class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskMan
         FileBackedTaskManager restoredManager = FileBackedTaskManager.loadFromFile(testFile);
         String message = "Неудача при восстановлении задач из файла";
 
-        Task restoredTask1 = restoredManager.getTask(task1.getId());
-        Task restoredTask2 = restoredManager.getTask(task2.getId());
-        Epic restoredEpic1 = restoredManager.getEpic(epic1.getId());
-        Epic restoredEpic2 = restoredManager.getEpic(epic2.getId());
-        SubTask restoredSubtask1 = restoredManager.getSubtask(subTask1.getId());
-        SubTask restoredSubtask2 = restoredManager.getSubtask(subTask2.getId());
-        SubTask restoredSubtask3 = restoredManager.getSubtask(subTask3.getId());
+        Task restoredTask1 = restoredManager.getTask(task1.getId()).get();
+        Task restoredTask2 = restoredManager.getTask(task2.getId()).get();
+        Epic restoredEpic1 = restoredManager.getEpic(epic1.getId()).get();
+        Epic restoredEpic2 = restoredManager.getEpic(epic2.getId()).get();
+        SubTask restoredSubtask1 = restoredManager.getSubtask(subTask1.getId()).get();
+        SubTask restoredSubtask2 = restoredManager.getSubtask(subTask2.getId()).get();
+        SubTask restoredSubtask3 = restoredManager.getSubtask(subTask3.getId()).get();
 
         assertTrue(checkEqualTasks(restoredTask1, task1), message);
         assertTrue(checkEqualTasks(restoredTask2, task2), message);

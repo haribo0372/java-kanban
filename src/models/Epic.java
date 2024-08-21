@@ -111,7 +111,7 @@ public class Epic extends Task {
 
     @Override
     public String toString() {
-        int[] arrayWithSubTasksId = subTasks.stream().mapToInt(Task::getId).toArray();
+        int[] arrayWithSubTasksId = subTasks.stream().filter(i -> i.getId() != null).mapToInt(Task::getId).toArray();
         return "Epic{" +
                 "id=" + id +
                 ", name='" + name + '\'' +

@@ -38,30 +38,29 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public List<SubTask> getEpicSubtasks(int epicId) {
-        Epic epic = getEpic(epicId);
-        if (epic == null) return null;
-        return epic.getSubTasks();
+        Optional<Epic> epicOpt = getEpic(epicId);
+        return epicOpt.map(Epic::getSubTasks).orElse(null);
     }
 
     @Override
-    public Task getTask(int id) {
-        Task task = tasks.get(id);
-        updateHistory(task);
-        return task;
+    public Optional<Task> getTask(int id) {
+        Optional<Task> taskOpt = Optional.ofNullable(tasks.get(id));
+        taskOpt.ifPresent(this::updateHistory);
+        return taskOpt;
     }
 
     @Override
-    public SubTask getSubtask(int id) {
-        SubTask subTask = subtasks.get(id);
-        updateHistory(subTask);
-        return subTask;
+    public Optional<SubTask> getSubtask(int id) {
+        Optional<SubTask> subtaskOpt = Optional.ofNullable(subtasks.get(id));
+        subtaskOpt.ifPresent(this::updateHistory);
+        return subtaskOpt;
     }
 
     @Override
-    public Epic getEpic(int id) {
-        Epic epic = epics.get(id);
-        updateHistory(epic);
-        return epic;
+    public Optional<Epic> getEpic(int id) {
+        Optional<Epic> epicOpt = Optional.ofNullable(epics.get(id));
+        epicOpt.ifPresent(this::updateHistory);
+        return epicOpt;
     }
 
     @Override
@@ -98,7 +97,7 @@ public class InMemoryTaskManager implements TaskManager {
         int currentEpicId = currentEpic.getId();
         if (epics.get(currentEpicId) == null) return -1;
 
-        int id  = -1;
+        int id = -1;
         if (taskHasNoTime(subtask)) {
             id = serial++;
             subtask.setId(id);
@@ -146,7 +145,7 @@ public class InMemoryTaskManager implements TaskManager {
         int id = subtask.getId();
         SubTask storageSubtask = subtasks.get(id);
         if (storageSubtask == null) return;
-        Epic currentEpic = getEpic(storageSubtask.getCurrentEpic().getId());
+        Epic currentEpic = getEpic(storageSubtask.getCurrentEpic().getId()).get();
         currentEpic.updateSubTask(subtask);
 
         if (taskHasNoTime(subtask)) {
@@ -170,7 +169,7 @@ public class InMemoryTaskManager implements TaskManager {
     public void deleteTask(int id) {
         Task task = tasks.remove(id);
         historyManager.remove(id);
-        prioritizedTasks.removeIf(task::equals);
+        if (task != null) prioritizedTasks.removeIf(task::equals);
     }
 
     @Override
@@ -194,8 +193,8 @@ public class InMemoryTaskManager implements TaskManager {
         if (subTask == null) return;
         prioritizedTasks.removeIf(subTask::equals);
         int epicId = subTask.getCurrentEpic().getId();
-        Epic currentEpic = getEpic(epicId);
-        currentEpic.removeSubTask(subTask);
+        Optional<Epic> currentEpicOpt = getEpic(epicId);
+        currentEpicOpt.ifPresent(epic -> epic.removeSubTask(subTask));
     }
 
     @Override

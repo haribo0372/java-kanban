@@ -1,29 +1,12 @@
-import managers.FileBackedTaskManager;
+import managers.InMemoryTaskManager;
+import managers.Managers;
 import models.*;
 
-import java.io.File;
-import java.io.IOException;
-import java.time.Duration;
-import java.time.LocalDateTime;
-
 public class Main {
-    private static final FileBackedTaskManager taskManager;
-
-    static {
-        try {
-            File file = File.createTempFile("example", "txt");
-            taskManager = FileBackedTaskManager.loadFromFile(file);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
+    static InMemoryTaskManager taskManager = (InMemoryTaskManager) Managers.getDefault();
 
     public static void main(String[] args) {
-        String d = "PT5H";
-        Task task = new Task("1", "1", TaskStatus.NEW, Duration.parse(d),
-                LocalDateTime.parse("2000-01-01T01:01:01"));
 
-        System.out.println(task.toStringCSV());
     }
 
     static void printAllTasks() {
