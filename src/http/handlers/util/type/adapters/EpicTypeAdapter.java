@@ -23,6 +23,9 @@ public class EpicTypeAdapter implements JsonSerializer<Epic> {
         if (epic.getStartTime() != null)
             jsonObject.addProperty("startTime", epic.getStartTime().format(LocalDateTimeAdapter.getTimeFormatter()));
 
+        if (epic.getEndTime() != null)
+            jsonObject.addProperty("endTime", epic.getEndTime().format(LocalDateTimeAdapter.getTimeFormatter()));
+
         jsonObject.add("subTasks", context.serialize(epic.getSubTasks()));
         return jsonObject;
 

@@ -30,7 +30,7 @@ public class HistoryHttpHandler extends BaseHttpHandler implements HttpHandler {
     @Override
     protected Endpoint getEndpoint(String requestPath, String requestMethod) {
         String[] path = requestPath.split("/");
-        if (path[1].equals("history")) {
+        if (path[1].equals("history") && requestMethod.equals("GET")) {
             return Endpoint.GET_HISTORY;
         }
         return Endpoint.UNKNOWN;

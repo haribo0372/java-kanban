@@ -30,7 +30,7 @@ public class PrioritizedHttpHandler extends BaseHttpHandler implements HttpHandl
     @Override
     protected Endpoint getEndpoint(String requestPath, String requestMethod) {
         String[] path = requestPath.split("/");
-        if (path[1].equals("prioritized")) {
+        if (path[1].equals("prioritized") && requestMethod.equals("GET")) {
             return Endpoint.GET_PRIORITIZED;
         }
         return Endpoint.UNKNOWN;

@@ -19,13 +19,11 @@ import java.time.LocalDateTime;
 public class HttpTaskServer {
     private static final int PORT = 8080;
 
-    private TaskManager taskManager;
     private Gson gson;
     private HttpServer httpServer;
 
     public HttpTaskServer(TaskManager taskManager) {
         try {
-            this.taskManager = taskManager;
             this.gson = new GsonBuilder()
                     .registerTypeAdapter(Duration.class, new DurationTypeAdapter())
                     .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter())
@@ -45,7 +43,7 @@ public class HttpTaskServer {
         }
     }
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) {
         TaskManager taskManager = new InMemoryTaskManager();
         HttpTaskServer server = new HttpTaskServer(taskManager);
         server.start();

@@ -70,6 +70,10 @@ public class EpicsHttpHandler extends BaseHttpHandler implements HttpHandler {
     private void handlePostEpic(HttpExchange exchange) {
         try {
             String rBody = new String(exchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8);
+
+            if (rBody.isEmpty())
+                writeResponse(exchange, "Тело запроса не должно быть пустым", 400);
+
             Epic epic = gson.fromJson(rBody, Epic.class);
             if (epic.getId() == null) {
                 taskManager.addNewEpic(epic);
@@ -129,7 +133,7 @@ public class EpicsHttpHandler extends BaseHttpHandler implements HttpHandler {
                 return Endpoint.POST_EPIC;
             }
         }
-        if (pathParts.length == 4) {
+        if (pathParts.length == 4 && requestMethod.equals("GET")) {
             return Endpoint.GET_EPIC_SUBTASKS;
         }
         return Endpoint.UNKNOWN;
